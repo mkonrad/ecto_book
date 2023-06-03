@@ -1,0 +1,28 @@
+# Apple
+.DS_Store
+
+# Elixir
+src/**/_build
+src/**/cover
+src/**/deps
+src/**/doc
+src/**/.fetch
+*.ez
+src/**/config/*.secret.exs
+src/**/.elixir_ls/
+.env
+
+# Erlang
+*.eunit
+*.o
+*.beam
+*.plt
+*erl_crash.dump
+*.concrete/DEV_MODE
+
+# rebar 3
+*.rebar
+src/**/_checkouts/
+
+# vim
+*.swp
