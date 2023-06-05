@@ -1,0 +1,5 @@
+export APP_CONTAINER_ROOT=/opt
+export APP_NAME=music_db
+
+alias mix="docker compose run --rm app mix"
+alias iex="docker compose run --rm app iex -S mix"

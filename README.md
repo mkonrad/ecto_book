@@ -1,125 +1,20 @@
-A Phoenix Framework Docker Compose Repo
-=======================================
+Programming Ecto Book Notes 
+===========================
 
 ---
 
-This is a template repo and it can be utilized using the following pattern. 
+Repository for working through the Programming Ecto book.
 
+Starting Point
+--------------
 
-See the __Development__ section below for handy tips on setting aliases.
-
-Creating a Repository From this Template
-----------------------------------------
-
-[GitHub Documentation] [git-from-template]
-
-
-### Example Project
-
-#### Create a New Repository on GitHub.com
-
-- Go to https://github.com/aviumlabs/phoenix-compose
-- Select Use this template
-- Select Create a new repository
-
-Repository name: __gutentag__<br />
-Description: A hello world application<br />
-Public<br />
-
-- Select 'Create repository from template'
-
-Generating your repository...
-
-#### Clone the New Repository
-
-GitHub CLI
+Create GitHub repository based on aviumlabs/phoenix-compose
 
     $ cd <projects/directory>
-    $ gh repo clone aviumlabs/gutentag
-
-__or__
-
----
-
-#### Create and Clone a New Public Repository with GitHub CLI
-
-    $ cd <projects/directory>
-    $ gh repo create gutentag -c -d "A hello world app" --public \
+    $ gh repo create ecto_book -c -d \
+      "Repository for working through Programming Ecto" --public \
       -p aviumlabs/phoenix-compose 
 
-Created repository aviumlabs/gutentag on GitHub<br />
-Cloning into 'gutentag'...<br />
-
----
-
-#### Avium Labs Prepare Script
-
-The included prepare script will create a Phoenix Framework project. 
-
-Run `$ ./prepare -h` to get started.
-
-Running the prepare script to initialize the Phoenix Framework project:
-
-    $ cd gutentag
-    $ ./prepare -i gutentag -u
-
-...
-
-We are almost there! ...
-
-    $ ./prepare -f
-    
-Running mix ecto.create...
-
-...
-
-Running docker compose up; press cntl-c to stop.
-
-...
-
-
-The example application is now running in the foreground and can be shutdown 
-with `cntl-c`.
-
-Service Details
----------------
-
-The Phoenix Framework application is exposed on port 4000. 
-
-The src directory in the project working directory is bind mounted to the 
-APP\_CONTAINER\_ROOT directory which by default is set to /opt when initialized
-and is then set to /opt/\<application\_name\> after running finalize.
-
-The default APP\_CONTAINER\_ROOT can be set during the project initialization 
-phase by specifying the -r flag to the prepare script.
-
-    $ ./prepare -i gutentag -r /usr/local
-
-The prepare script performs the following actions during initialization:
-- generates a docker environment file (.env)
-- generates a random password for the Postgres account 
-
-The prepare script performs the following actions during finalization:
-- prepares the config/dev.exs dev environment:
-  - sets the ip address to 0, 0, 0, 0
-  - sets the database host
-  - sets the database password (pulled from the .env file)
-
-
-### Docker Images
-- Phoenix Framework image: aviumlabs/phoenix:latest-alpine 
-- PostgreSQL image: postgres:15.3-alpine3.18
-
-Umbrella Project
-----------------
-A Phoenix Framework umbrella project can also be created with the prepare 
-script. 
-
-    $ ./prepare -i <app_name> -r /opt -u
-    $ ./prepare -i <app_name> -u
-
-Official Elixir Umbrella Documentation 
-[Link](https://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-projects.html)
 
 Development
 -----------
@@ -128,37 +23,88 @@ your favorite local development environment to continue with developing
 your application.
 
 ### Running Mix Against the Docker Container
-To run mix against the container, setting up some aliases can reduce some 
-typing.
+Running mix against the container, set up the following aliases:
 
-Create a file in the root of the application directory with the following 
-content, e.g. `.<app_name>dev`:
+#### Source File 
+    
+    File name: .mdbdev
+
+    $ cd <project/root/dir>
 
     export APP_CONTAINER_ROOT=/opt
-    export APP_NAME=app
+    export APP_NAME=music_db
 
-    alias mix="docker compose exec app mix"
-    alias amix="docker compose exec -w "$APP_CONTAINER_ROOT/$APP_NAME"_umbrella/apps/$APP_NAME app mix"
-    alias wmix="docker compose exec -w "$APP_CONTAINER_ROOT/$APP_NAME"_umbrella/apps/"$APP_NAME"_web app mix"
-    alias iex="docker compose exec app iex"
+    alias mix="docker compose run --rm app mix"
+    alias iex="docker compose run --rm app iex -S mix"
 
 Then before starting development, source the file in your shell:
 
-    $ cd <app>/<root>
-    $ . ./.<app_name>dev
+    $ cd <app/root>
+    $ . ./.mdbdev
    
 Comfirm the aliases are set correctly:
 
     $ alias
 
-If you are not using an umbrella application structure, don't forget to remove the 
-`_umbrella/apps` from the above aliases.
 
-#### Breakdown of the aliases
+Prepare Script
+--------------
 
-* docker compose exec is the docker syntax for executing a command in a container.
+The prepare script included in aviumlabs/phoenix-compose configures a Phoenix
+Framework and PostgreSQL application. This does not follow the books pattern of 
+a straight Elixir project.
+
+    $ ./prepare -i music_db 
+
+        > ...
+        > * running mix deps.get
+        > * running mix assets.setup
+        > * running mix deps.compile
+        > ...
+        > You can also run your app...
+
+    $ ./prepare -f 
+
+        > Running mix ecto.create...
+        > ...
+        > Running docker compose up; press cntl-c to stop.
+
+
+
+### Book Resources
+
+#### Prerequisites
+Download the books resources from the book's web site. 
+
+Change the MusicDB reference to MusicDb in the seed, migrations and the 
+lib/\*.ex files.
+
+Add the using\_postgres? function to the repo.ex module.
+
+From the resources, copy the priv/repo/seed.exs, migration lib/\* files: 
+
+    $ cd <path_to>/code/priv/repo
+    $ cp seed.exs <path_to>/src/music_db/priv/repo
+    $ cp migrations/* <path_to>/src/music_db/priv/repo/migrations
+    $ cd ../../lib
+    $ cp album.ex album_genre.ex album_with_embed.ex artist.ex artist_embed.ex \
+      band.ex genre.ex log.ex note.ex search_engine.ex solo_artist.ex track.ex \
+      track_embed.ex <path_to>/src/music_db/lib/music_db
+    $ cd src/music_db
+    $ mix ecto.setup
+
+        > ...
+        > Success! Sample data has been added.
+
+Now work through the book examples.
+
+
+Additional Information
+----------------------
+
+#### Breakdown of the docker aliases
+
+* docker compose run is the docker syntax for executing a command in a container.
 * app is the container to execute the command in.
 * mix is the command to execute.
 
-
-[git-from-template]: https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
