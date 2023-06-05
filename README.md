@@ -31,6 +31,8 @@ Running mix against the container, set up the following aliases:
 
     $ cd <project/root/dir>
 
+Create the .mdbdev file with the following content:
+
     export APP_CONTAINER_ROOT=/opt
     export APP_NAME=music_db
 
@@ -39,12 +41,15 @@ Running mix against the container, set up the following aliases:
 
 Then before starting development, source the file in your shell:
 
-    $ cd <app/root>
+    $ cd <project/root/dir>
     $ . ./.mdbdev
    
 Comfirm the aliases are set correctly:
 
     $ alias
+
+        > iex='docker compose run --rm app iex -S mix'
+        > mix='docker compose run --rm app mix'
 
 
 Prepare Script
@@ -101,6 +106,47 @@ Now work through the book examples.
 
 Additional Information
 ----------------------
+
+### aviumlabs/phoenix-compose runtime
+By default aviumlabs/phoenix-compose runs the docker services in the foreground.
+
+To run mix ecto.reset, you need to stop the running services `ctrl-c` and 
+then run the following:
+
+    $ docker compose up db
+    $ mix ecto.reset
+    $ ctrl-c
+    $ docker compose up
+
+Alternatively, you can run the docker services in the background;
+
+    $ docker compose up -d
+
+Then run the steps above as follows:
+
+    $ docker compose stop app
+    $ mix ecto.reset
+    $ docker compose start app
+
+To watch the db logs, run:
+
+    $ docker logs -f ecto_book-db-1
+
+To watch the app logs, run:
+
+    $ docker logs -f ecto_book-app-1
+
+
+If you are not sure of the container names, run:
+
+    $ docker container ls
+
+| CONTAINER ID     | IMAGE            | ...  | NAMES                |
+|------------------|------------------|------|----------------------|
+| nnn              | postgres:15.3... | ...  | ecto\_book-db-1      |
+| nnn              | aviumlabs/...    | ...  | ecto\_book-app-1     |
+
+
 
 #### Breakdown of the docker aliases
 
